@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query
 
 from backend.repositories import registrations as reg_store
-from backend.schemas.admin import RegistrationCreate, RegistrationUpdate
+from backend.schemas.admin import RegistrationCreate, RegistrationUpdate, ResendConfirmationRequest
 from backend.services.fulfillment import resend_confirmation
 from backend.utils.logging import get_logger
 
@@ -78,13 +78,15 @@ async def update_registration(registration_id: str, data: RegistrationUpdate):
 
 
 @router.post("/registrations/{registration_id}/resend-confirmation")
-async def resend_confirmation_email(registration_id: str):
+async def resend_confirmation_email(registration_id: str, body: ResendConfirmationRequest = None):
     reg = reg_store.find_by_id(registration_id)
     if not reg:
         raise HTTPException(status_code=404, detail="Registration not found")
     if reg.payment_status != "PAID":
         raise HTTPException(status_code=400, detail="Registration is not paid")
-    success = await resend_confirmation(registration_id)
+    email_override = body.email if body else None
+    whatsapp_override = body.whatsapp_link if body else None
+    success = await resend_confirmation(registration_id, email=email_override, whatsapp_link=whatsapp_override)
     if not success:
         raise HTTPException(status_code=500, detail="Failed to send email")
     return {"status": "sent"}

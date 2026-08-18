@@ -62,5 +62,10 @@ class RegistrationUpdate(BaseModel):
     fulfillment_status: str | None = None
 
 
+class ResendConfirmationRequest(BaseModel):
+    email: str | None = None
+    whatsapp_link: str | None = None
+
+
 class ManualVerifyRequest(BaseModel):
     reference: str

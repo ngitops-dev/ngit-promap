@@ -98,7 +98,11 @@ async def fulfill_registration(registration_id: str, payment_reference: str) -> 
         )
 
 
-async def resend_confirmation(registration_id: str) -> bool:
+async def resend_confirmation(
+    registration_id: str,
+    email: str | None = None,
+    whatsapp_link: str | None = None,
+) -> bool:
     registration = registration_store.find_by_id(registration_id)
     if not registration:
         return False
@@ -108,9 +112,12 @@ async def resend_confirmation(registration_id: str) -> bool:
 
     program_name = program.program_name if program else registration.program_id
     cohort_name = cohort.cohort_name if cohort else registration.cohort_id
-    whatsapp_link = cohort.whatsapp_link if cohort else ""
+    default_whatsapp = cohort.whatsapp_link if cohort else ""
     amount = cohort.expected_amount if cohort else ""
     currency = cohort.currency if cohort else "NGN"
+
+    final_whatsapp = whatsapp_link if whatsapp_link else default_whatsapp
+    recipient = email if email else registration.email
 
     subject = f"Your {program_name} Payment is Confirmed"
     body = PAYMENT_CONFIRMATION_TEMPLATE.format(
@@ -119,7 +126,7 @@ async def resend_confirmation(registration_id: str) -> bool:
         cohort_name=cohort_name,
         currency=currency,
         amount=amount,
-        whatsapp_link=whatsapp_link,
+        whatsapp_link=final_whatsapp,
     )
 
-    return gmail.send_email(registration.email, subject, body)
+    return gmail.send_email(recipient, subject, body)
