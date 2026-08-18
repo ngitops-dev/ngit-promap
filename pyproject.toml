@@ -20,3 +20,6 @@ dependencies = [
     "streamlit-authenticator>=0.4.2",
     "uvicorn[standard]>=0.52.3",
 ]
+
+[tool.fastapi]
+entrypoint = "backend.main:app"
