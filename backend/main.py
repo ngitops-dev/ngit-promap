@@ -80,7 +80,7 @@ async def root():
 
 
 app.include_router(health_router, tags=["Health"])
-app.include_router(webhooks_router, tags=["Webhooks"])
+app.include_router(webhooks_router, prefix="/api/v1", tags=["Webhooks"])
 app.include_router(programs_router, prefix="/api/v1", tags=["Programs"])
 app.include_router(registrations_router, prefix="/api/v1", tags=["Registrations"])
 app.include_router(payments_router, prefix="/api/v1", tags=["Payments"])
