@@ -68,6 +68,17 @@ async def add_request_id(request: Request, call_next):
     return response
 
 
+@app.get("/")
+async def root():
+    return {
+        "name": "NGiT Platform API",
+        "version": "0.1.0",
+        "status": "running",
+        "docs": "/docs",
+        "environment": settings.APP_ENV,
+    }
+
+
 app.include_router(health_router, tags=["Health"])
 app.include_router(webhooks_router, tags=["Webhooks"])
 app.include_router(programs_router, prefix="/api/v1", tags=["Programs"])
