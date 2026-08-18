@@ -28,10 +28,15 @@ async def paystack_webhook(
     except json.JSONDecodeError:
         return {"status": "error", "message": "Invalid JSON"}
 
-    event_type = event.get("type", "")
+    event_type = event.get("event", "")
     event_id = event.get("id", "")
     data = event.get("data", {})
     reference = data.get("reference", "")
+
+    logger.info(
+        "Webhook received | event_type=%s | event_id=%s | reference=%s | full_payload=%s",
+        event_type, event_id, reference, event,
+    )
 
     log_event({
         "event_id": event_id,
@@ -41,7 +46,7 @@ async def paystack_webhook(
         "processed_at": "",
         "status": "RECEIVED",
         "error_message": "",
-        "payload": "",
+        "payload": json.dumps(event),
     })
 
     if event_type != "charge.success":
